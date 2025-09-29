@@ -1,527 +1,499 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tasty Bites Restaurant - ChatBot</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+      }
+      .chat-container {
+        width: 100%;
+        max-width: 800px;
+        height: 600px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .chat-header {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 20px 20px 0 0;
+        position: relative;
+      }
+      .chat-header h1 {
+        font-size: 1.5rem;
+        margin-bottom: 5px;
+      }
+      .chat-header p {
+        opacity: 0.9;
+        font-size: 0.9rem;
+      }
+      .status-indicator {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 12px;
+        height: 12px;
+        background: #00c851;
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+          opacity: 1;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+        50% {
+          transform: scale(1.1);
+          opacity: 0.7;
         }
-
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .chat-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f8f9fa;
+        scroll-behavior: smooth;
+      }
+      .message {
+        margin-bottom: 15px;
+        animation: fadeIn 0.3s ease-in;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .message.user {
+        text-align: right;
+      }
+      .message.bot {
+        text-align: left;
+      }
+      .message-bubble {
+        display: inline-block;
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        word-wrap: break-word;
+        white-space: pre-line;
+      }
+      .message.user .message-bubble {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-bottom-right-radius: 4px;
+      }
+      .message.bot .message-bubble {
+        background: white;
+        color: #333;
+        border: 1px solid #e9ecef;
+        border-bottom-left-radius: 4px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .timestamp {
+        font-size: 0.7rem;
+        opacity: 0.6;
+        margin-top: 5px;
+      }
+      .chat-input {
+        padding: 20px;
+        background: white;
+        border-top: 1px solid #e9ecef;
+      }
+      .input-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .input-group input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 25px;
+        outline: none;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+      .input-group input:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+      .send-btn {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 45px;
+        height: 45px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .send-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+      }
+      .send-btn:active {
+        transform: scale(0.95);
+      }
+      .loading {
+        text-align: center;
+        padding: 10px;
+        color: #666;
+      }
+      .loading::after {
+        content: "";
+        animation: dots 1.5s steps(5, end) infinite;
+      }
+      @keyframes dots {
+        0%,
+        20% {
+          content: ".";
+        }
+        40% {
+          content: "..";
+        }
+        60% {
+          content: "...";
+        }
+        80%,
+        100% {
+          content: "";
+        }
+      }
+      .payment-btn {
+        background: #00c851;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+      }
+      .payment-btn:hover {
+        background: #007e33;
+        transform: translateY(-2px);
+      }
+      .quick-options {
+        padding: 15px;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .quick-option {
+        background: white;
+        border: 2px solid #e9ecef;
+        padding: 8px 12px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+      }
+      .quick-option:hover {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+      @media (max-width: 768px) {
         .chat-container {
-            width: 100%;
-            max-width: 800px;
-            height: 600px;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+          height: 100vh;
+          border-radius: 0;
+          max-width: none;
         }
-
         .chat-header {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            border-radius: 20px 20px 0 0;
+          border-radius: 0;
         }
-
-        .chat-header h1 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-
-        .chat-header p {
-            opacity: 0.9;
-            font-size: 0.9rem;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #f8f9fa;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            animation: fadeIn 0.3s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.user {
-            text-align: right;
-        }
-
-        .message.bot {
-            text-align: left;
-        }
-
         .message-bubble {
-            display: inline-block;
-            max-width: 80%;
-            padding: 12px 16px;
-            border-radius: 18px;
-            word-wrap: break-word;
-            white-space: pre-line;
+          max-width: 90%;
         }
-
-        .message.user .message-bubble {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .message.bot .message-bubble {
-            background: white;
-            color: #333;
-            border: 1px solid #e9ecef;
-            border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-
-        .timestamp {
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-top: 5px;
-        }
-
-        .chat-input {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .input-group {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .input-group input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 2px solid #e9ecef;
-            border-radius: 25px;
-            outline: none;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .input-group input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .send-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 45px;
-            height: 45px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .send-btn:active {
-            transform: scale(0.95);
-        }
-
-        .loading {
-            text-align: center;
-            padding: 10px;
-            color: #666;
-        }
-
-        .loading::after {
-            content: '';
-            animation: dots 1.5s steps(5, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60% { content: '...'; }
-            80%, 100% { content: ''; }
-        }
-
-        .payment-btn {
-            background: #00C851;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .payment-btn:hover {
-            background: #007E33;
-            transform: translateY(-2px);
-        }
-
-        .quick-options {
-            padding: 15px;
-            background: #f8f9fa;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .quick-option {
-            background: white;
-            border: 2px solid #e9ecef;
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-
-        .quick-option:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        @media (max-width: 768px) {
-            .chat-container {
-                height: 100vh;
-                border-radius: 0;
-                max-width: none;
-            }
-            
-            .chat-header {
-                border-radius: 0;
-            }
-            
-            .message-bubble {
-                max-width: 90%;
-            }
-        }
-
-        .status-indicator {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 12px;
-            height: 12px;
-            background: #00C851;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="chat-container">
-        <div class="chat-header">
-            <div class="status-indicator"></div>
-            <h1>🍽️ Tasty Bites Restaurant</h1>
-            <p>Your friendly food ordering assistant</p>
-        </div>
+      <div class="chat-header">
+        <div class="status-indicator"></div>
+        <h1>🍽️ Tasty Bites Restaurant</h1>
+        <p>Your friendly food ordering assistant</p>
+      </div>
 
-        <div class="chat-messages" id="chatMessages">
-            <% if (chatHistory && chatHistory.length > 0) { %>
-                <% chatHistory.forEach(function(message) { %>
-                    <div class="message <%= message.isBot ? 'bot' : 'user' %>">
-                        <div class="message-bubble">
-                            <%= message.text %>
-                        </div>
-                        <div class="timestamp">
-                            <%= new Date(message.timestamp).toLocaleTimeString() %>
-                        </div>
-                    </div>
-                <% }); %>
-            <% } %>
+      <div class="chat-messages" id="chatMessages">
+        <% if (chatHistory && chatHistory.length > 0) { %> <%
+        chatHistory.forEach(function(message) { %>
+        <div class="message <%= message.isBot ? 'bot' : 'user' %>">
+          <div class="message-bubble"><%= message.text %></div>
+          <div class="timestamp">
+            <%= new Date(message.timestamp).toLocaleTimeString() %>
+          </div>
         </div>
+        <% }); %> <% } %>
+      </div>
 
-        <div class="quick-options">
-            <div class="quick-option" onclick="sendQuickMessage('1')">🍴 Place Order</div>
-            <div class="quick-option" onclick="sendQuickMessage('97')">🛒 View Cart</div>
-            <div class="quick-option" onclick="sendQuickMessage('99')">💳 Checkout</div>
-            <div class="quick-option" onclick="sendQuickMessage('98')">📋 Order History</div>
-            <div class="quick-option" onclick="sendQuickMessage('0')">❌ Cancel Order</div>
+      <div class="quick-options">
+        <div class="quick-option" onclick="sendQuickMessage('1')">
+          🍴 Place Order
         </div>
+        <div class="quick-option" onclick="sendQuickMessage('97')">
+          🛒 View Cart
+        </div>
+        <div class="quick-option" onclick="sendQuickMessage('99')">
+          💳 Checkout
+        </div>
+        <div class="quick-option" onclick="sendQuickMessage('98')">
+          📋 Order History
+        </div>
+        <div class="quick-option" onclick="sendQuickMessage('0')">
+          ❌ Cancel Order
+        </div>
+      </div>
 
-        <div class="chat-input">
-            <div class="input-group">
-                <input 
-                    type="text" 
-                    id="messageInput" 
-                    placeholder="Type your message or select an option number..." 
-                    maxlength="10"
-                    autocomplete="off"
-                >
-                <button class="send-btn" onclick="sendMessage()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
-                    </svg>
-                </button>
-            </div>
+      <div class="chat-input">
+        <div class="input-group">
+          <input
+            type="text"
+            id="messageInput"
+            placeholder="Type your message or select an option number..."
+            maxlength="100"
+            autocomplete="off"
+          />
+          <button class="send-btn" onclick="sendMessage()">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+            </svg>
+          </button>
         </div>
+      </div>
     </div>
 
     <script>
-        let isLoading = false;
+      let isLoading = false;
 
-        function scrollToBottom() {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
+      function scrollToBottom() {
+        const messagesContainer = document.getElementById("chatMessages");
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
 
-        function addMessage(text, isBot = false) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const timestamp = new Date().toLocaleTimeString();
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isBot ? 'bot' : 'user'}`;
-            messageDiv.innerHTML = `
+      function addMessage(text, isBot = false) {
+        const messagesContainer = document.getElementById("chatMessages");
+        const timestamp = new Date().toLocaleTimeString();
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${isBot ? "bot" : "user"}`;
+        messageDiv.innerHTML = `
                 <div class="message-bubble">${text}</div>
                 <div class="timestamp">${timestamp}</div>
             `;
-            
-            messagesContainer.appendChild(messageDiv);
-            scrollToBottom();
+        messagesContainer.appendChild(messageDiv);
+        scrollToBottom();
+      }
+
+      function showLoading() {
+        if (isLoading) return;
+        isLoading = true;
+        const messagesContainer = document.getElementById("chatMessages");
+        const loadingDiv = document.createElement("div");
+        loadingDiv.className = "message bot";
+        loadingDiv.id = "loadingMessage";
+        loadingDiv.innerHTML = `<div class="message-bubble"><div class="loading">Typing</div></div>`;
+        messagesContainer.appendChild(loadingDiv);
+        scrollToBottom();
+      }
+
+      function hideLoading() {
+        isLoading = false;
+        const loadingMessage = document.getElementById("loadingMessage");
+        if (loadingMessage) loadingMessage.remove();
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const message = input.value.trim();
+        if (!message || isLoading) return;
+
+        // Validation: allow numbers or text (future expansion)
+        if (!/^\d+$/.test(message) && message.length < 2) {
+          addMessage(
+            "❌ Please enter a valid option number or response.",
+            true
+          );
+          return;
         }
 
-        function showLoading() {
-            if (isLoading) return;
-            isLoading = true;
-            
-            const messagesContainer = document.getElementById('chatMessages');
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message bot';
-            loadingDiv.id = 'loadingMessage';
-            loadingDiv.innerHTML = `
+        input.value = "";
+        addMessage(message, false);
+        showLoading();
+
+        try {
+          const response = await fetch("/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message }),
+          });
+          const data = await response.json();
+          hideLoading();
+
+          if (data.success) {
+            const lastBotMessage = data.chatHistory
+              .filter((msg) => msg.isBot)
+              .pop();
+            if (lastBotMessage) {
+              addMessage(lastBotMessage.text, true);
+              if (
+                lastBotMessage.text.includes("Pay with Paystack") ||
+                lastBotMessage.text.includes("Payment Options")
+              ) {
+                setTimeout(showPaymentButton, 1000);
+              }
+            }
+          } else {
+            addMessage(
+              data.message || "Sorry, something went wrong. Please try again.",
+              true
+            );
+          }
+        } catch (error) {
+          hideLoading();
+          addMessage("❌ Connection error. Please try again.", true);
+          console.error("Error:", error);
+        }
+      }
+
+      function sendQuickMessage(message) {
+        const input = document.getElementById("messageInput");
+        input.value = message;
+        sendMessage();
+      }
+
+      function showPaymentButton() {
+        const existing = document.getElementById("paystackButton");
+        if (existing) existing.remove();
+
+        const messagesContainer = document.getElementById("chatMessages");
+        const paymentDiv = document.createElement("div");
+        paymentDiv.id = "paystackButton";
+        paymentDiv.className = "message bot";
+        paymentDiv.innerHTML = `
                 <div class="message-bubble">
-                    <div class="loading">Typing</div>
-                </div>
-            `;
-            messagesContainer.appendChild(loadingDiv);
-            scrollToBottom();
-        }
-
-        function hideLoading() {
-            isLoading = false;
-            const loadingMessage = document.getElementById('loadingMessage');
-            if (loadingMessage) {
-                loadingMessage.remove();
-            }
-        }
-
-        async function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            
-            if (!message || isLoading) return;
-            
-            // Validate input (only numbers allowed)
-            if (!/^\d+$/.test(message)) {
-                addMessage('❌ Please enter only numbers (e.g., 1, 97, 98, 99)', true);
-                return;
-            }
-            
-            input.value = '';
-            addMessage(message, false);
-            showLoading();
-            
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message })
-                });
-                
-                const data = await response.json();
-                hideLoading();
-                
-                if (data.success) {
-                    // Get the last bot message from the updated chat history
-                    const lastBotMessage = data.chatHistory
-                        .filter(msg => msg.isBot)
-                        .pop();
-                    
-                    if (lastBotMessage) {
-                        addMessage(lastBotMessage.text, true);
-                        
-                        // Check if message contains checkout info and show payment button
-                        if (lastBotMessage.text.includes('Pay with Paystack') || 
-                            lastBotMessage.text.includes('Payment Options')) {
-                            setTimeout(() => {
-                                showPaymentButton();
-                            }, 1000);
-                        }
-                    }
-                } else {
-                    addMessage(data.message || 'Sorry, something went wrong. Please try again.', true);
-                }
-            } catch (error) {
-                hideLoading();
-                addMessage('❌ Connection error. Please check your internet and try again.', true);
-                console.error('Error:', error);
-            }
-        }
-
-        function sendQuickMessage(message) {
-            const input = document.getElementById('messageInput');
-            input.value = message;
-            sendMessage();
-        }
-
-        function showPaymentButton() {
-            const messagesContainer = document.getElementById('chatMessages');
-            const paymentDiv = document.createElement('div');
-            paymentDiv.className = 'message bot';
-            paymentDiv.innerHTML = `
-                <div class="message-bubble">
-                    💳 Ready to pay? Click the button below to proceed with Paystack:
+                    💳 Ready to pay? Click below:
                     <br><br>
-                    <button class="payment-btn" onclick="initiatePayment()">
-                        💳 Pay Now with Paystack
-                    </button>
-                    <br><br>
-                    <small>🔒 Secure payment powered by Paystack</small>
+                    <button class="payment-btn" onclick="initiatePayment()">💳 Pay Now with Paystack</button>
                 </div>
                 <div class="timestamp">${new Date().toLocaleTimeString()}</div>
             `;
-            messagesContainer.appendChild(paymentDiv);
-            scrollToBottom();
+        messagesContainer.appendChild(paymentDiv);
+        scrollToBottom();
+      }
+
+      async function initiatePayment() {
+        const email =
+          prompt("Please enter your email address for the receipt:") ||
+          "customer@example.com";
+        if (!email.includes("@")) {
+          addMessage("❌ Please enter a valid email address.", true);
+          return;
         }
-
-        async function initiatePayment() {
-            const email = prompt('Please enter your email address for the receipt:') || 'customer@example.com';
-            
-            if (!email.includes('@')) {
-                addMessage('❌ Please enter a valid email address.', true);
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                const response = await fetch('/initiate-payment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email })
-                });
-                
-                const data = await response.json();
-                hideLoading();
-                
-                if (data.success && data.authorization_url) {
-                    addMessage('🔄 Redirecting to Paystack for secure payment...', true);
-                    setTimeout(() => {
-                        window.location.href = data.authorization_url;
-                    }, 1500);
-                } else {
-                    addMessage('❌ Payment initialization failed. Please try again or contact support.', true);
-                }
-            } catch (error) {
-                hideLoading();
-                addMessage('❌ Payment error. Please try again later.', true);
-                console.error('Payment error:', error);
-            }
+        showLoading();
+        try {
+          const response = await fetch("/initiate-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email }),
+          });
+          const data = await response.json();
+          hideLoading();
+          if (data.success && data.authorization_url) {
+            addMessage("🔄 Redirecting to Paystack...", true);
+            setTimeout(
+              () => (window.location.href = data.authorization_url),
+              1500
+            );
+          } else {
+            addMessage("❌ Payment failed. Please try again.", true);
+          }
+        } catch (error) {
+          hideLoading();
+          addMessage("❌ Payment error. Please try again later.", true);
+          console.error("Payment error:", error);
         }
+      }
 
-        // Handle Enter key press
-        document.getElementById('messageInput').addEventListener('keypress', function(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
+      document
+        .getElementById("messageInput")
+        .addEventListener("keypress", (e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
         });
 
-        // Auto-scroll to bottom on page load
-        window.addEventListener('load', function() {
-            scrollToBottom();
+      window.addEventListener("load", () => {
+        scrollToBottom();
+        updateConnectionStatus(navigator.onLine);
+        document.getElementById("messageInput").focus();
+      });
+
+      document.querySelectorAll(".quick-option").forEach((option) => {
+        option.addEventListener("click", function () {
+          this.style.transform = "scale(0.95)";
+          setTimeout(() => {
+            this.style.transform = "scale(1)";
+          }, 150);
         });
+      });
 
-        // Auto-focus input on page load
-        document.getElementById('messageInput').focus();
-
-        // Add input validation
-        document.getElementById('messageInput').addEventListener('input', function(event) {
-            // Only allow numbers and limit length
-            this.value = this.value.replace(/[^0-9]/g, '').substring(0, 2);
-        });
-
-        // Add visual feedback for quick options
-        document.querySelectorAll('.quick-option').forEach(option => {
-            option.addEventListener('click', function() {
-                this.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    this.style.transform = 'scale(1)';
-                }, 150);
-            });
-        });
-
-        // Prevent form submission on Enter if loading
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Enter' && isLoading) {
-                event.preventDefault();
-                return false;
-            }
-        });
-
-        // Add connection status indicator
-        let connectionStatus = true;
-        
-        function updateConnectionStatus(status) {
-            const indicator = document.querySelector('.status-indicator');
-            if (status) {
-                indicator.style.background = '#00C851';
-                indicator.title = 'Connected';
-            } else {
-                indicator.style.background = '#ff4444';
-                indicator.title = 'Connection issues';
-            }
+      let connectionStatus = true;
+      function updateConnectionStatus(status) {
+        const indicator = document.querySelector(".status-indicator");
+        if (status) {
+          indicator.style.background = "#00C851";
+          indicator.title = "Connected";
+        } else {
+          indicator.style.background = "#ff4444";
+          indicator.title = "Connection issues";
         }
-
-        // Monitor connection
-        window.addEventListener('online', () => updateConnectionStatus(true));
-        window.addEventListener('offline', () => updateConnectionStatus(false));
-
-        // Add smooth scrolling behavior
-        document.getElementById('chatMessages').style.scrollBehavior = 'smooth';
+      }
+      window.addEventListener("online", () => updateConnectionStatus(true));
+      window.addEventListener("offline", () => updateConnectionStatus(false));
+    </script>
+  </body>
+</html>
