@@ -126,11 +126,11 @@ const handleCheckout = (req) => {
   return (
     `🛒 Order Summary:\n\n${formatOrder(req.session.currentOrder)}\n\n` +
     `📅 Scheduling Options:\n` +
-    `1️⃣ Order now (immediate)\n` +
-    `2️⃣ Schedule for later\n\n` +
+    `1. Order now (immediate)\n` +
+    `2. Schedule for later\n\n` +
     `💳 Payment Options:\n` +
-    `3️⃣ Pay with Paystack\n` +
-    `0️⃣ Back to main menu\n\n` +
+    `3. Pay with Paystack\n` +
+    `0. Back to main menu\n\n` +
     `Type your choice:`
   );
 };
@@ -143,8 +143,8 @@ const handleScheduling = (req, input) => {
       return (
         "✅ Order scheduled for immediate preparation.\n\n" +
         "💳 Please choose payment method:\n" +
-        "1️⃣ Pay with Paystack\n" +
-        "0️⃣ Back to main menu"
+        "1. Pay with Paystack\n" +
+        "0. Back to main menu"
       );
 
     case "2":
@@ -152,8 +152,8 @@ const handleScheduling = (req, input) => {
       return (
         "⏰ Order scheduled for 1 hour from now.\n\n" +
         "💳 Please choose payment method:\n" +
-        "1 Pay with Paystack\n" +
-        "0 Back to main menu"
+        "1. Pay with Paystack\n" +
+        "0. Back to main menu"
       );
 
     default:
