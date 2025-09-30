@@ -11,7 +11,7 @@ router.get("/", (req, res) => {
   initializeSession(req);
 
   if (req.session.chatHistory.length === 0) {
-    addBotMessage(req, "🍽️ Welcome to Tasty Bites Restaurant!");
+    addBotMessage(req, "Welcome to Tasty Bites Restaurant!");
     addBotMessage(req, getMainMenuOptions());
   }
 

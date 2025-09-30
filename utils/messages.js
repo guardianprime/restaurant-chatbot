@@ -4,20 +4,20 @@ const menuCategories = require("../data/menu");
 function getMainMenuOptions() {
   return `
 📋 Main Menu:
-1️⃣ Place an order
-9️⃣9️⃣ Checkout order
-9️⃣8️⃣ See order history
-9️⃣7️⃣ See current order
-0️⃣ Cancel order`;
+1. Place an order
+99. Checkout order
+98. See order history
+97. See current order
+0. Cancel order`;
 }
 
 function getCategoryMenu() {
   return `
 🍽️ Food Categories:
-1️⃣ Appetizers
-2️⃣ Main Courses
-3️⃣ Beverages
-0️⃣ Back to main menu`;
+1. Appetizers
+2. Main Courses
+3. Beverages
+0. Back to main menu`;
 }
 
 function getMenuItems(category) {
@@ -30,7 +30,7 @@ function getMenuItems(category) {
       item.description
     }\n\n`;
   });
-  menu += `0️⃣ Back to categories`;
+  menu += `0 Back to categories`;
   return menu;
 }
 
